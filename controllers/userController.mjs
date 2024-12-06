@@ -45,11 +45,9 @@ export const login = async (req, res) => {
 		const user = await User.findOne({ email });
 		if (user && (await bcrypt.compare(password, user.password))) {
 			req.session.user = user;
-			res.redirect("/dashboard");
-		} else {
-			console.log("failed");
-			res.render("login", { message: "Invalid credentials" });
+			return res.redirect("/dashboard");
 		}
+		res.render("login", { message: "Invalid credentials" });
 	} catch (error) {
 		console.log(error.message);
 	}
@@ -57,9 +55,7 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
 	try {
-		req.session.destroy(() => {
-			console.log("session cleared");
-		});
+		req.session.destroy();
 		res.redirect("/");
 	} catch (error) {
 		console.log(error.message);
@@ -68,8 +64,7 @@ export const logout = async (req, res) => {
 
 export const loadDashboard = async (req, res) => {
 	try {
-		if (!req.session.user) res.redirect("/");
-		else res.render("dashboard", { user: req.session.user });
+		res.render("dashboard", { user: req.session.user });
 	} catch (error) {
 		console.log(error.message);
 	}

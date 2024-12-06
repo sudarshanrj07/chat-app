@@ -13,6 +13,7 @@ import {
 	loadDashboard,
 } from "../controllers/userController.mjs";
 import "dotenv/config";
+import { isLoggedIn, isLoggedOut } from "../middlewares/auth.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { SESSION_SECERT } = process.env;
@@ -38,12 +39,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get("/register", registerLoad);
+router.get("/register", isLoggedOut, registerLoad);
 router.post("/register", upload.single("image"), register);
-router.get("/", loadLogin);
+router.get("/", isLoggedOut, loadLogin);
 router.post("/", login);
-router.get("/logout", logout);
-router.get("/dashboard", loadDashboard);
+router.get("/logout", isLoggedIn, logout);
+router.get("/dashboard", isLoggedIn, loadDashboard);
 
 router.get("*", (req, res) => {
 	res.redirect("/");
