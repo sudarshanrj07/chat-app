@@ -3,8 +3,7 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import { fileURLToPath } from "url";
 import path from "path";
-import { registerLoad } from "../controllers/userController.mjs";
-import { register } from "module";
+import { registerLoad, register } from "../controllers/userController.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express();
