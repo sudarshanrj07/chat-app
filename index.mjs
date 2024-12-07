@@ -18,13 +18,12 @@ const io = new Server(serv);
 const userNameSpace = io.of("/user-namespace");
 
 userNameSpace.on("connection", async (socket) => {
-	console.log("user Conneceted");
 	const userId = socket.handshake.auth.token;
 	await User.findByIdAndUpdate({ _id: userId }, { $set: { is_online: "1" } });
+	socket.broadcast.emit("getOnlineUser", { user_id: userId });
 	socket.on("disconnect", async () => {
-		console.log("user disconnected");
-
 		await User.findByIdAndUpdate({ _id: userId }, { $set: { is_online: "0" } });
+		socket.broadcast.emit("getOfflineUser", { user_id: userId });
 	});
 });
 

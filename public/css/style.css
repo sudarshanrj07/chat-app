@@ -10915,3 +10915,9 @@ a[data-toggle="collapse"] {
 .chat-section {
 	display: none;
 }
+.online-status{
+	color: green;
+}
+.offline-status{
+	color: red;
+}
