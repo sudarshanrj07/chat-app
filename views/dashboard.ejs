@@ -26,6 +26,10 @@
     </div>
 </div>
 <script>
+    const sender_id = '<%= user._id %>';
+    const socket = io('/user-namespace',{
+      auth: { token: sender_id,}
+    });
     $(document).ready(()=>{
         $(".user-list").click(()=>{
             $(".start-head").hide();
