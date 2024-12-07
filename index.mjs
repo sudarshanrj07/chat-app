@@ -5,6 +5,7 @@ import http from "http";
 import routes from "./routes/userRoutes.mjs";
 import { Server } from "socket.io";
 import { User } from "./models/userModule.mjs";
+import { Chat } from "./models/chatModule.mjs";
 mongoose.connect("mongodb://localhost/chat-app");
 
 const app = express();
@@ -27,6 +28,16 @@ userNameSpace.on("connection", async (socket) => {
 	});
 	socket.on("newChat", (data) => {
 		socket.broadcast.emit("loadNewChat", data);
+	});
+	socket.on("getChatHistory", async (data) => {
+		const chatHistory = await Chat.find({
+			$or: [
+				{ sender_id: data.sender_id, receiver_id: data.receiver_id },
+				{ sender_id: data.receiver_id, receiver_id: data.sender_id },
+			],
+		});
+
+		socket.emit("postChatHistory", { chats: chatHistory });
 	});
 });
 
