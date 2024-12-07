@@ -25,6 +25,9 @@ userNameSpace.on("connection", async (socket) => {
 		await User.findByIdAndUpdate({ _id: userId }, { $set: { is_online: "0" } });
 		socket.broadcast.emit("getOfflineUser", { user_id: userId });
 	});
+	socket.on("newChat", (data) => {
+		socket.broadcast.emit("loadNewChat", data);
+	});
 });
 
 serv.listen(PORT, () => {
