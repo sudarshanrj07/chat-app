@@ -12,6 +12,7 @@ import {
 	login,
 	loadDashboard,
 	saveChat,
+	deleteMessage,
 } from "../controllers/userController.mjs";
 import "dotenv/config";
 import { isLoggedIn, isLoggedOut } from "../middlewares/auth.mjs";
@@ -47,6 +48,7 @@ router.post("/", login);
 router.get("/logout", isLoggedIn, logout);
 router.get("/dashboard", isLoggedIn, loadDashboard);
 router.post("/storeChat", saveChat);
+router.post("/deleteMessage", deleteMessage);
 
 router.get("*", (req, res) => {
 	res.redirect("/");

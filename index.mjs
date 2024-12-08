@@ -39,6 +39,9 @@ userNameSpace.on("connection", async (socket) => {
 
 		socket.emit("postChatHistory", { chats: chatHistory });
 	});
+	socket.on("messageDeleted", (data) => {
+		socket.broadcast.emit("messageDeletedSuccess", data);
+	});
 });
 
 serv.listen(PORT, () => {
