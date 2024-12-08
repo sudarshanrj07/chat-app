@@ -44,7 +44,7 @@
     </div>
 </div>
 
- <!-- Modal -->
+ <!-- delete Modal -->
   <div class="modal fade" id="deleteMessageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
@@ -68,6 +68,32 @@
       </div>
     </div>
   </div>
+
+
+<!-- edit Modal -->
+<div class="modal fade" id="editMessageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Edit Message</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="edit-message-form">
+        <div class="modal-body">
+            <input type="hidden" name="id" id="edit-message-id">
+            <input type="text" name="message" id="update-message" placeholder="Enter Message" required>
+           
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>  
 <script>
     const sender_id = '<%= user._id %>';
     let receiver_id;
@@ -109,8 +135,10 @@
                 const chat = response.data.message;
                 const html = `
                 <div class="current-user-chat" id='`+response.data._id+`'>
-                   <h5> ${chat} 
-                     <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i><h5>
+                   <h5> <span>${chat}</span> 
+                    <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
+                    <i class="fa fa-edit" aria-hidden="true" data-id='`+response.data._id+`' data-msg='`+chat+`'data-toggle="modal" data-target="#editMessageModal"></i>
+                    <h5>
                 </div>`;
                 $("#chat-container").append(html);
               
@@ -147,9 +175,12 @@ socket.on('loadNewChat',(data)=>{
                 addClass='distance-user-chat';
 
             html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
-               <h5> `+chatHistory[x].message+``;
+               <h5> <span>`+chatHistory[x].message+`</span>`;
                 if(chatHistory[x].sender_id == sender_id)
-                    html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>`;
+                    html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
+                    <i class="fa fa-edit" aria-hidden="true" data-id='`+chatHistory[x]._id+`'  data-msg='`+chatHistory[x].message+`'data-toggle="modal" data-target="#editMessageModal"></i>
+                `
+                ;
                  
             html+= `<h5>
             </div>`;
@@ -195,7 +226,38 @@ socket.on('loadNewChat',(data)=>{
         $('#'+id).remove();
     })
 
-    
+    $(document).on('click', '.fa-edit', function(){
+       
+        $('#edit-message-id').val($(this).attr('data-id'));
+        $('#update-message').val($(this).attr('data-msg'));
+    });
+
+
+    $('#edit-message-form').submit((e)=>{
+        e.preventDefault();
+
+        const id = $('#edit-message-id').val();
+        const msg = $('#update-message').val();
+       
+        $.ajax({
+        url:'/editMessage',
+        type: 'POST',
+        data:{id: id, editedMessage: msg},
+        success: function(response){
+            if(response.success){
+               $('#editMessageModal').modal('hide');
+               $('#'+id).find('span').text(msg);
+               $('#'+id).find('.fa-edit').attr('data-msg',msg)
+               socket.emit('messageUpdated', {id: id, editedMessage: msg});
+            }else alert(response.msg)
+        }
+    });
+    });
+    socket.on('messageUpdatedSuccess', (data)=>{
+        console.log(data);
+        $('#'+data.id).find('span').text(data.editedMessage);
+    })
+
 
 </script>
 <%- include('layouts/footer.ejs') %>

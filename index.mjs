@@ -42,6 +42,9 @@ userNameSpace.on("connection", async (socket) => {
 	socket.on("messageDeleted", (data) => {
 		socket.broadcast.emit("messageDeletedSuccess", data);
 	});
+	socket.on("messageUpdated", (data) => {
+		socket.broadcast.emit("messageUpdatedSuccess", data);
+	});
 });
 
 serv.listen(PORT, () => {

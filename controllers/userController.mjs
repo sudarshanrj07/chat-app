@@ -100,3 +100,20 @@ export const deleteMessage = async (req, res) => {
 		res.status(400).send({ success: false, msg: error.message });
 	}
 };
+
+export const editMessage = async (req, res) => {
+	try {
+		const { id, editedMessage } = req.body;
+		await Chat.findByIdAndUpdate(
+			{ _id: id },
+			{
+				$set: {
+					message: editedMessage,
+				},
+			}
+		);
+		res.status(200).send({ success: true });
+	} catch (error) {
+		res.status(400).send({ success: false, msg: error.message });
+	}
+};
