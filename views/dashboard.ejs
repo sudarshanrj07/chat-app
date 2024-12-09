@@ -4,6 +4,7 @@
 <div class="row">
 	<div class="col-md-4">
 		<ul class="list-group">
+            
 			<% if(users.length>0){ for(let i =0; i<users.length;i++){ %>
 			<li class="list-group-item list-group-item-dark cursor-pointer user-list" data-id="<%= users[i]._id %>" >
                 <img src="<%= "http://localhost:3000/"+users[i].image %>" alt="" width="50px" height="50px">
@@ -35,10 +36,17 @@
                     hello
                 </div>
             </div>
-            <form action="" id="chat-form">
+            <form action="" id="chat-form" >
                 <input type="text" name="message" id="message" class="border" placeholder="Enter message"required/>
-                <input type="submit" value="Send message" class="btn btn-primary"/>    
+            
+                <input type="submit" value="Send message" class="btn btn-primary"/>
+                
             </form>
+            <form action=""  id="image-form"  method="post" enctype="multipart/form-data">
+                <input type="file" name="image" id="image"/>
+                <input type="submit" value="Send message" class="btn btn-primary"/>
+            </form>
+            
         </div>
         
     </div>
@@ -124,11 +132,12 @@
     $('#chat-form').submit((e)=>{
         event.preventDefault();
         const message = $('#message').val();
-    
+        
     $.ajax({
         url:'/storeChat',
         type: 'POST',
         data:{sender_id:sender_id, receiver_id:receiver_id, message: message},
+        
         success: (response)=>{
             if(response.success){
                 $('#message').val("");
@@ -149,18 +158,66 @@
     });
     
 });
-socket.on('loadNewChat',(data)=>{
+
+$('#image-form').submit((e)=>{
+        event.preventDefault();
+        const fileInput = $('#image')[0];
+    const file = fileInput.files[0]; 
+
+    if (!file) {
+        alert("Please select a file.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', file); // Add the file to the FormData object
+    formData.append('sender_id', sender_id); // Add other form data (like sender_id, receiver_id)
+    formData.append('receiver_id', receiver_id);
+                
+    $.ajax({
+        url:'/storeImage',
+        type: 'POST',
+        data:formData,
+        processData: false,  
+        contentType: false,  
+        success: (response)=>{
+            if(response.success){
+                $('#image').val("");
+                const chat =  "http://localhost:3000/images/"+response.data.message;
+                const html = `
+                <div class="current-user-chat" id='`+response.data._id+`'>
+                   <img src="${chat}" alt width="300px" height="200px">
+                </div>`;
+                $("#chat-container").append(html);
+                console.log(chat);
+                socket.emit("newChat", response.data);
+                scrollChat();
+            }else alert(data.msg)
+        }
+    });
+    
+});
+
+
+    socket.on('loadNewChat',(data)=>{
    
       
-    if(sender_id == data.receiver_id && receiver_id == data.sender_id){
-      
-        const html = `
-            <div class="distance-user-chat" id='`+data._id+`'>
-               <h5> ${data.message} <h5>
-            </div>`;
+        if(sender_id == data.receiver_id && receiver_id == data.sender_id){
+            let html = ""
+            if((data.message.split('.').pop())== 'jpg'){
+                    html = `<div class="distance-user-chat" id='`+data._id+`'>
+                        <img src="http://localhost:3000/images/`+data.message+`" alt width="300px" height="200px">
+                        </div>`;                       
+                }
+                else{
+                html = `<div class="distance-user-chat" id='`+data._id+`'>
+                    <h5> ${data.message} <h5>
+                    </div>`;
+                } 
             $("#chat-container").append(html);
             scrollChat();
-}    });
+        }    
+    });
 
     //load chat history
     socket.on('postChatHistory', (data)=>{
@@ -173,7 +230,14 @@ socket.on('loadNewChat',(data)=>{
                 addClass='current-user-chat';
             else
                 addClass='distance-user-chat';
-
+            if((chatHistory[x].message.split('.').pop())== 'jpg'){
+                html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
+                    <img src="http://localhost:3000/images/`+chatHistory[x].message+`" alt width="300px" height="200px">
+                    </div>`;
+                    
+                       
+            }
+            else{
             html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
                <h5> <span>`+chatHistory[x].message+`</span>`;
                 if(chatHistory[x].sender_id == sender_id)
@@ -184,6 +248,7 @@ socket.on('loadNewChat',(data)=>{
                  
             html+= `<h5>
             </div>`;
+        }
         }
         $("#chat-container").append(html);
         scrollChat();

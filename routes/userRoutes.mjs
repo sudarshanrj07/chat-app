@@ -14,6 +14,7 @@ import {
 	saveChat,
 	deleteMessage,
 	editMessage,
+	saveImage,
 } from "../controllers/userController.mjs";
 import "dotenv/config";
 import { isLoggedIn, isLoggedOut } from "../middlewares/auth.mjs";
@@ -51,6 +52,8 @@ router.get("/dashboard", isLoggedIn, loadDashboard);
 router.post("/storeChat", saveChat);
 router.post("/deleteMessage", deleteMessage);
 router.post("/editMessage", editMessage);
+
+router.post("/storeImage", upload.single("image"), saveImage);
 
 router.get("*", (req, res) => {
 	res.redirect("/");

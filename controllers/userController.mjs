@@ -76,17 +76,43 @@ export const loadDashboard = async (req, res) => {
 
 export const saveChat = async (req, res) => {
 	try {
+		console.log("inside save chat");
+		const message = req.file.filename || req.body.message;
+		console.log(message);
 		const {
-			body: { sender_id, receiver_id, message },
+			body: { sender_id, receiver_id },
 		} = req;
+		console.log("after const");
 		const chat = new Chat({
 			sender_id: sender_id,
 			receiver_id: receiver_id,
 			message: message,
 		});
 		const newChat = await chat.save();
+		console.log("after save");
 		if (!newChat) res.status(400).send({ success: false, msg: error.message });
 		res.status(200).send({ success: true, msg: "Chat saved", data: newChat });
+	} catch (error) {
+		res.status(400).send({ success: false, msg: error.message });
+	}
+};
+export const saveImage = async (req, res) => {
+	try {
+		if (!req.file)
+			res.status(400).send({ success: false, msg: "Image not uploaded" });
+		const {
+			body: { sender_id, receiver_id },
+			file: { filename },
+		} = req;
+		const chat = new Chat({
+			sender_id: sender_id,
+			receiver_id: receiver_id,
+			message: filename,
+		});
+		const newChat = await chat.save();
+		if (!newChat)
+			res.status(400).send({ success: false, msg: "Cannot save user" });
+		res.status(200).send({ success: true, msg: "imaage saved", data: newChat });
 	} catch (error) {
 		res.status(400).send({ success: false, msg: error.message });
 	}
