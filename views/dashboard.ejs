@@ -3,7 +3,9 @@
 <h2 class="mb-4">Hi, <%= user.name %></h2>
 <div class="row">
 	<div class="col-md-4">
-		<ul class="list-group">
+        
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search users">
+		<ul class="list-group" id="userList">
             
 			<% if(users.length>0){ for(let i =0; i<users.length;i++){ %>
 			<li class="list-group-item list-group-item-dark cursor-pointer user-list" data-id="<%= users[i]._id %>" >
@@ -108,6 +110,24 @@
     const socket = io('/user-namespace',{
       auth: { token: sender_id,}
     });
+
+    $(document).ready(function() {
+    $('#searchInput').on('input', function() {
+
+        const query = $(this).val().toLowerCase();
+
+        $('.user-list').each(function() {
+            const userName = $(this).text().toLowerCase();
+            
+            if (userName.includes(query)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+});
+
     $(document).ready(()=>{
         $(".user-list").click(function(){
             let userId = $(this).attr("data-id");
