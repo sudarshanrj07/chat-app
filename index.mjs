@@ -35,10 +35,32 @@ userNameSpace.on("connection", async (socket) => {
 				{ sender_id: data.sender_id, receiver_id: data.receiver_id },
 				{ sender_id: data.receiver_id, receiver_id: data.sender_id },
 			],
-		});
-
+		})
+			.sort({ createdAt: -1 }) // Sort by created_at descending, if that's your timestamp field
+			.limit(15); // Limit to 50 records;
 		socket.emit("postChatHistory", { chats: chatHistory });
 	});
+
+	socket.on("getChatHistory2", async (data) => {
+		console.log("inside chat 2");
+		const message = await Chat.findById(data.message_id);
+		if (!message) {
+			return;
+		}
+		console.log("before chat history");
+		const chatHistory = await Chat.find({
+			$or: [
+				{ sender_id: data.sender_id, receiver_id: data.receiver_id },
+				{ sender_id: data.receiver_id, receiver_id: data.sender_id },
+			],
+			createdAt: { $lt: message.createdAt },
+		})
+			.sort({ createdAt: -1 }) // Sort by created_at descending, if that's your timestamp field
+			.limit(5); // Limit to 50 records;
+		console.log("after chat history");
+		socket.emit("allChatHistory", { chats: chatHistory });
+	});
+
 	socket.on("messageDeleted", (data) => {
 		socket.broadcast.emit("messageDeletedSuccess", data);
 	});
