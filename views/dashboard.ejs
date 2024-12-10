@@ -29,14 +29,11 @@
 	<div class="col-md-8">
         <h3 class="start-head">click to start chat</h3>
         <div class="chat-section">
-        
+            <div class="mb-3">
+                <input type="text" id="messageSearch" class="form-control" placeholder="Search message..." />
+            </div>
             <div id="chat-container">
-                <div class="current-user-chat">
-                    hii
-                </div>
-                <div class="distance-user-chat">
-                    hello
-                </div>
+                
             </div>
             <form action="" id="chat-form" >
                 <input type="text" name="message" id="message" class="border" placeholder="Enter message"required/>
@@ -125,8 +122,9 @@
                 $(this).hide();
             }
         });
+        });
     });
-});
+
 
     $(document).ready(()=>{
         $(".user-list").click(function(){

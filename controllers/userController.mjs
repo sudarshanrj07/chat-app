@@ -76,13 +76,9 @@ export const loadDashboard = async (req, res) => {
 
 export const saveChat = async (req, res) => {
 	try {
-		console.log("inside save chat");
-		const message = req.file.filename || req.body.message;
-		console.log(message);
 		const {
-			body: { sender_id, receiver_id },
+			body: { sender_id, receiver_id, message },
 		} = req;
-		console.log("after const");
 		const chat = new Chat({
 			sender_id: sender_id,
 			receiver_id: receiver_id,
