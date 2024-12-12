@@ -85,7 +85,6 @@ export const saveChat = async (req, res) => {
 			message: message,
 		});
 		const newChat = await chat.save();
-		console.log("after save");
 		if (!newChat) res.status(400).send({ success: false, msg: error.message });
 		res.status(200).send({ success: true, msg: "Chat saved", data: newChat });
 	} catch (error) {

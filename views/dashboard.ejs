@@ -34,19 +34,17 @@
             
             <div id="chat-container" class="chat-container">
                 
-            </div>
+            </div class="form-control mb-3">
             <form action="" id="chat-form" >
-                <input type="text" name="message" id="message" class="border" placeholder="Enter message"required/>
-            
-                <input type="submit" value="Send message" class="btn btn-primary"/>
+                <input type="text" name="message" id="message" class="border" placeholder="Enter message" enctype="multipart/form-data"/>
                 
-            </form>
-            <form action=""  id="image-form"  method="post" enctype="multipart/form-data">
-                <input type="file" name="image" id="image"/>
-                <input type="submit" value="Send message" class="btn btn-primary"/>
-            </form>
-            <button class="loadMoreChatsBtn">Load More Chats</button>
-            
+                
+                <label class="uploadIcon">
+                    <img src="http://files.softicons.com/download/toolbar-icons/mono-general-icons-4-by-custom-icon-design/ico/upload.ico" onClick="$('#image').click();" />
+                  </label>
+                <input type="submit" value="Send" style=" width:9%" class="btn btn-primary"/>
+                <input type="file" name="image" id="image" style="visibility:hidden"/>
+            </form>            
         </div>
         
     </div>
@@ -129,20 +127,19 @@
 
     $(document).ready(function() {
     $('#messageSearch').on('input', function() {
-        const query = $(this).val().toLowerCase();  // Get the search query and convert it to lowercase
+        const query = $(this).val().toLowerCase();  
 
-        // Iterate over all message elements inside the chat container
+       
         $('.current-user-chat, .distance-user-chat').each(function() {
-            const message = $(this).text().toLowerCase();  // Get the text of the current message and convert it to lowercase
-            const messageId = $(this).attr('id');  // Get the ID of the current message div (if needed)
-            console.log(message + "   "+ messageId);
+            const message = $(this).text().toLowerCase();  
+            const messageId = $(this).attr('id');
             
-            if (message.includes(query)) {  // If the message contains the query
+            if (message.includes(query)) {  
                   $("#"+messageId)[0].scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
-                // $(this).hide();  // Hide the message if it doesn't match
+                
             }
         });
     });
@@ -176,72 +173,62 @@
     $('#chat-form').submit((e)=>{
         event.preventDefault();
         const message = $('#message').val();
-        
-    $.ajax({
-        url:'/storeChat',
-        type: 'POST',
-        data:{sender_id:sender_id, receiver_id:receiver_id, message: message},
-        
-        success: (response)=>{
-            if(response.success){
-                $('#message').val("");
-                const chat = response.data.message;
-                const html = `
-                <div class="current-user-chat" id='`+response.data._id+`'>
-                   <h5> <span>${chat}</span> 
-                    <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
-                    <i class="fa fa-edit" aria-hidden="true" data-id='`+response.data._id+`' data-msg='`+chat+`'data-toggle="modal" data-target="#editMessageModal"></i>
-                    <h5>
-                </div>`;
-                $("#chat-container").append(html);
-              
-                socket.emit("newChat", response.data);
-                scrollChat();
-            }else alert(data.msg)
-        }
-    });
+        const file = $('#image')[0].files[0];
     
-});
-
-$('#image-form').submit((e)=>{
-        event.preventDefault();
-        const fileInput = $('#image')[0];
-    const file = fileInput.files[0]; 
-
-    if (!file) {
-        alert("Please select a file.");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('image', file); // Add the file to the FormData object
-    formData.append('sender_id', sender_id); // Add other form data (like sender_id, receiver_id)
-    formData.append('receiver_id', receiver_id);
+        if(message){
+        $.ajax({
+            url:'/storeChat',
+            type: 'POST',
+            data:{sender_id:sender_id, receiver_id:receiver_id, message: message},
+            
+            success: (response)=>{
+                if(response.success){
+                    $('#message').val("");
+                    const chat = response.data.message;
+                    const html = `
+                    <div class="current-user-chat" id='`+response.data._id+`'>
+                    <h5> <span>${chat}</span> 
+                        <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
+                        <i class="fa fa-edit" aria-hidden="true" data-id='`+response.data._id+`' data-msg='`+chat+`'data-toggle="modal" data-target="#editMessageModal"></i>
+                        <h5>
+                    </div>`;
+                    $("#chat-container").append(html);
                 
-    $.ajax({
-        url:'/storeImage',
-        type: 'POST',
-        data:formData,
-        processData: false,  
-        contentType: false,  
-        success: (response)=>{
-            if(response.success){
-                $('#image').val("");
-                const chat =  "http://localhost:3000/images/"+response.data.message;
-                const html = `
-                <div class="current-user-chat" id='`+response.data._id+`'>
-                   <img src="${chat}" alt width="300px" height="200px">
-                </div>`;
-                $("#chat-container").append(html);
-                console.log(chat);
-                socket.emit("newChat", response.data);
-                scrollChat();
-            }else alert(data.msg)
-        }
-    });
-    
-});
+                    socket.emit("newChat", response.data);
+                    scrollChat();
+                }else alert(data.msg)
+            }
+        });}
 
+        if (file) {
+        const formData = new FormData();
+        formData.append('image', file); // Add the file to the FormData object
+        formData.append('sender_id', sender_id); // Add other form data (like sender_id, receiver_id)
+        formData.append('receiver_id', receiver_id);
+                    
+        $.ajax({
+            url:'/storeImage',
+            type: 'POST',
+            data:formData,
+            processData: false,  
+            contentType: false,  
+            success: (response)=>{
+                if(response.success){
+                    $('#image').val("");
+                    const chat =  "http://localhost:3000/images/"+response.data.message;
+                    const html = `
+                    <div class="current-user-chat" id='`+response.data._id+`'>
+                    <img src="${chat}" alt width="300px" height="200px">
+                    </div>`;
+                    $("#chat-container").append(html);
+                    socket.emit("newChat", response.data);
+                    scrollChat();
+                }else alert(data.msg)
+            }
+        });
+        }
+    
+    });
 
     socket.on('loadNewChat',(data)=>{
    
@@ -316,14 +303,12 @@ $('#image-form').submit((e)=>{
     // console.log("inside btn");
     // console.log(lastMessageId);
     if ($(this).scrollTop() === 0) {
-        console.log("Scrolled to the top");
         socket.emit("getChatHistory2", {sender_id: sender_id, receiver_id: receiver_id, message_id:lastMessageId});
     }
     });
 
         //load remaining chat history
         socket.on('allChatHistory', (data)=>{
-                console.log("inside all chats");
         const chatHistory = data.chats.reverse();;
         lastMessageId = chatHistory[0]._id;
         let html ="";
@@ -415,7 +400,7 @@ $('#image-form').submit((e)=>{
     });
     });
     socket.on('messageUpdatedSuccess', (data)=>{
-        console.log(data);
+       
         $('#'+data.id).find('span').text(data.editedMessage);
     })
 

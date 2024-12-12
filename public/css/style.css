@@ -10910,7 +10910,29 @@ a[data-toggle="collapse"] {
 	overflow: scroll;
 }
 .border {
-	width: 75%;
+	width: 82%;
+	height: 40px; /* Adjusts height to a fixed value (can change to your desired height) */
+	padding: 8px; /* Optional: Add padding inside the input */
+	font-size: 14px; /* Optional: Set a font size */
+	border: 1px solid #ccc; /* Optional: Border color */
+	border-radius: 4px; /* Optional: Rounded corners */
+}
+
+/* input[type="file"] {
+	display: none;
+} */
+
+.uploadIcon {
+	border: 1px solid #ccc;
+	display: inline-block;
+	padding: 6px 12px;
+	width: 7%;
+	cursor: pointer;
+}
+
+.uploadIcon img {
+	display: inline-block;
+	width: 24px;
 }
 .chat-section {
 	display: none;
