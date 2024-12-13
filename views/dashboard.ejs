@@ -8,7 +8,7 @@
 		<ul class="list-group" id="userList">
             
 			<% if(users.length>0){ for(let i =0; i<users.length;i++){ %>
-			<li class="list-group-item list-group-item-dark cursor-pointer user-list" data-id="<%= users[i]._id %>" >
+			<li class="list-group-item cursor-pointer user-list" data-id="<%= users[i]._id %>" >
                 <img src="<%= "http://localhost:3000/"+users[i].image %>" alt="" width="50px" height="50px">
                 <%= users[i].name %>
                 <% 
@@ -36,12 +36,10 @@
                 
             </div class="form-control mb-3">
             <form action="" id="chat-form" >
-                <input type="text" name="message" id="message" class="border" placeholder="Enter message" enctype="multipart/form-data"/>
-                
-                
                 <label class="uploadIcon">
                     <img src="http://files.softicons.com/download/toolbar-icons/mono-general-icons-4-by-custom-icon-design/ico/upload.ico" onClick="$('#image').click();" />
                   </label>
+                <input type="text" name="message" id="message" class="border" placeholder="Enter message" enctype="multipart/form-data"/>
                 <input type="submit" value="Send" style=" width:9%" class="btn btn-primary"/>
                 <input type="file" name="image" id="image" style="visibility:hidden"/>
             </form>            
@@ -153,6 +151,8 @@
             $(".start-head").hide();
             $(".chat-section").show();
             socket.emit("getChatHistory", {sender_id: sender_id, receiver_id: receiver_id});
+            $(".user-list").removeClass("list-group-item-dark");  // Remove highlight from all users
+            $(this).addClass("list-group-item-dark");
             
         });
     });
@@ -187,9 +187,10 @@
                     const chat = response.data.message;
                     const html = `
                     <div class="current-user-chat" id='`+response.data._id+`'>
-                    <h5> <span>${chat}</span> 
-                        <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
+                    <h5> <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
                         <i class="fa fa-edit" aria-hidden="true" data-id='`+response.data._id+`' data-msg='`+chat+`'data-toggle="modal" data-target="#editMessageModal"></i>
+                        <span>${chat}</span> 
+                        
                         <h5>
                     </div>`;
                     $("#chat-container").append(html);
@@ -218,7 +219,9 @@
                     const chat =  "http://localhost:3000/images/"+response.data.message;
                     const html = `
                     <div class="current-user-chat" id='`+response.data._id+`'>
+                        <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>    
                     <img src="${chat}" alt width="300px" height="200px">
+                    
                     </div>`;
                     $("#chat-container").append(html);
                     socket.emit("newChat", response.data);
@@ -264,27 +267,29 @@
         lastMessageId = chatHistory[0]._id;
         let html ="";
         for(let x=0; x<chatHistory.length;x++){
-            let addClass = "";
-            if(chatHistory[x].sender_id == sender_id)
-                addClass='current-user-chat';
-            else
-                addClass='distance-user-chat';
+            const addClass = chatHistory[x].sender_id == sender_id ? 'current-user-chat' : 'distance-user-chat';
             if((chatHistory[x].message.split('.').pop())== 'jpg'){
-                html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
-                    <img src="http://localhost:3000/images/`+chatHistory[x].message+`" alt width="300px" height="200px">
+                html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >`
+                    if(chatHistory[x].sender_id == sender_id)
+                    html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>`
+                    
+                    html+=`<img src="http://localhost:3000/images/`+chatHistory[x].message+`" alt width="300px" height="200px">
+                    
                     </div>`;
                     
                        
             }
             else{
             html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
-               <h5> <span>`+chatHistory[x].message+`</span>`;
-                if(chatHistory[x].sender_id == sender_id)
+               <h5>`;
+                 if(chatHistory[x].sender_id == sender_id)
                     html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
                     <i class="fa fa-edit" aria-hidden="true" data-id='`+chatHistory[x]._id+`'  data-msg='`+chatHistory[x].message+`'data-toggle="modal" data-target="#editMessageModal"></i>
                 `;
+                
+                
                  
-            html+= `<h5>
+            html+= `<span>`+chatHistory[x].message+`</span><h5>
             </div>`;
         }
         }
@@ -313,27 +318,29 @@
         lastMessageId = chatHistory[0]._id;
         let html ="";
         for(let x=0; x<chatHistory.length;x++){
-            let addClass = "";
-            if(chatHistory[x].sender_id == sender_id)
-                addClass='current-user-chat';
-            else
-                addClass='distance-user-chat';
+            const addClass = chatHistory[x].sender_id == sender_id ? 'current-user-chat' : 'distance-user-chat';
             if((chatHistory[x].message.split('.').pop())== 'jpg'){
-                html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
-                    <img src="http://localhost:3000/images/`+chatHistory[x].message+`" alt width="300px" height="200px">
+                html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >`;
+                    if(chatHistory[x].sender_id == sender_id)
+                    html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>`;
+                    
+                    html+=`<img src="http://localhost:3000/images/`+chatHistory[x].message+`" alt width="300px" height="200px">
+                    
                     </div>`;
                     
                        
             }
             else{
             html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
-               <h5> <span>`+chatHistory[x].message+`</span>`;
-                if(chatHistory[x].sender_id == sender_id)
+               <h5>`;
+                 if(chatHistory[x].sender_id == sender_id)
                     html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
                     <i class="fa fa-edit" aria-hidden="true" data-id='`+chatHistory[x]._id+`'  data-msg='`+chatHistory[x].message+`'data-toggle="modal" data-target="#editMessageModal"></i>
                 `;
+                
+                
                  
-            html+= `<h5>
+            html+= `<span>`+chatHistory[x].message+`</span> <h5>
             </div>`;
         }
         }
