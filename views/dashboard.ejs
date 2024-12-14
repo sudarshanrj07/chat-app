@@ -41,7 +41,7 @@
                   </label>
                 <input type="text" name="message" id="message" class="border" placeholder="Enter message" enctype="multipart/form-data"/>
                 <input type="submit" value="Send" style=" width:9%" class="btn btn-primary"/>
-                <input type="file" name="image" id="image" style="visibility:hidden"/>
+                <input type="file" name="image" id="image" style="visibility:hidden" onchange="fileSelected()"/>
             </form>            
         </div>
         
@@ -126,8 +126,8 @@
     $(document).ready(function() {
     $('#messageSearch').on('input', function() {
         const query = $(this).val().toLowerCase();  
-
-       
+        $('.current-user-chat, .distance-user-chat').removeClass('highlight');
+        if (query) {
         $('.current-user-chat, .distance-user-chat').each(function() {
             const message = $(this).text().toLowerCase();  
             const messageId = $(this).attr('id');
@@ -137,9 +137,14 @@
                     behavior: 'smooth',
                     block: 'start'
                 });
-                
+                $(this).addClass('highlight');
             }
         });
+    } else {
+        $('.current-user-chat, .distance-user-chat').removeClass('highlight');
+            console.log("Query is empty, all highlights removed.");
+        }
+        
     });
 });
 
@@ -183,15 +188,18 @@
             
             success: (response)=>{
                 if(response.success){
+                    const {message, _id,createdAt} = response.data;
                     $('#message').val("");
                     const chat = response.data.message;
+                    const time = createdAt.slice(createdAt.indexOf('T')+1,createdAt.indexOf('T')+6);
+
                     const html = `
-                    <div class="current-user-chat" id='`+response.data._id+`'>
-                    <h5> <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
-                        <i class="fa fa-edit" aria-hidden="true" data-id='`+response.data._id+`' data-msg='`+chat+`'data-toggle="modal" data-target="#editMessageModal"></i>
-                        <span>${chat}</span> 
+                    <div class="current-user-chat" id='`+_id+`'>
+                     <div><i class="fa fa-trash" aria-hidden="true" data-id='`+_id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
+                        <i class="fa fa-edit" aria-hidden="true" data-id='`+_id+`' data-msg='`+message+`'data-toggle="modal" data-target="#editMessageModal"></i>
+                        <h5><span>${message}  </span> 
                         
-                        <h5>
+                        </h5><sub>${time}</sub></div>
                     </div>`;
                     $("#chat-container").append(html);
                 
@@ -216,11 +224,13 @@
             success: (response)=>{
                 if(response.success){
                     $('#image').val("");
-                    const chat =  "http://localhost:3000/images/"+response.data.message;
+                    const {message, createdAt, _id}  =response.data;
+                    const chat =  "http://localhost:3000/images/"+message;
+                    const time = createdAt.slice(createdAt.indexOf('T')+1,createdAt.indexOf('T')+6);
                     const html = `
-                    <div class="current-user-chat" id='`+response.data._id+`'>
-                        <i class="fa fa-trash" aria-hidden="true" data-id='`+response.data._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>    
-                    <img src="${chat}" alt width="300px" height="200px">
+                    <div class="current-user-chat" id='`+_id+`'>
+                        <i class="fa fa-trash" aria-hidden="true" data-id='`+_id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>    
+                    <img src="${chat}" alt width="300px" height="200px"> <sub>${time}</sub>
                     
                     </div>`;
                     $("#chat-container").append(html);
@@ -235,17 +245,21 @@
 
     socket.on('loadNewChat',(data)=>{
    
-      
+        const {message, _id, createdAt} = data;
+        const time = createdAt.slice(createdAt.indexOf('T')+1,createdAt.indexOf('T')+6);
         if(sender_id == data.receiver_id && receiver_id == data.sender_id){
             let html = ""
-            if((data.message.split('.').pop())== 'jpg'){
-                    html = `<div class="distance-user-chat" id='`+data._id+`'>
-                        <img src="http://localhost:3000/images/`+data.message+`" alt width="300px" height="200px">
+            if((message.split('.').pop())== 'jpg'){
+                    html = `<div class="distance-user-chat" id='`+_id+`'>
+                         <img src="http://localhost:3000/images/`+message+`" alt width="300px" height="200px">
+                          <sub>${time}</sub>
                         </div>`;                       
                 }
                 else{
-                html = `<div class="distance-user-chat" id='`+data._id+`'>
-                    <h5> ${data.message} <h5>
+                html = `<div class="distance-user-chat" id='`+_id+`'>
+                    <div>
+                    <h5>  ${message} </h5><sub>${time}</sub> </div>
+                       
                     </div>`;
                 } 
             $("#chat-container").append(html);
@@ -268,29 +282,28 @@
         let html ="";
         for(let x=0; x<chatHistory.length;x++){
             const addClass = chatHistory[x].sender_id == sender_id ? 'current-user-chat' : 'distance-user-chat';
+            const time = chatHistory[x].createdAt.slice(chatHistory[x].createdAt.indexOf('T')+1,chatHistory[x].createdAt.indexOf('T')+6);
             if((chatHistory[x].message.split('.').pop())== 'jpg'){
                 html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >`
+                    
                     if(chatHistory[x].sender_id == sender_id)
                     html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>`
                     
                     html+=`<img src="http://localhost:3000/images/`+chatHistory[x].message+`" alt width="300px" height="200px">
-                    
+                    <sub>${time}</sub>
                     </div>`;
                     
                        
             }
             else{
             html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
-               <h5>`;
+               <div>`;
                  if(chatHistory[x].sender_id == sender_id)
                     html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
                     <i class="fa fa-edit" aria-hidden="true" data-id='`+chatHistory[x]._id+`'  data-msg='`+chatHistory[x].message+`'data-toggle="modal" data-target="#editMessageModal"></i>
                 `;
-                
-                
-                 
-            html+= `<span>`+chatHistory[x].message+`</span><h5>
-            </div>`;
+ 
+            html+= `<h5> <span>`+chatHistory[x].message+`</span></h5> <sub>${time}</sub></div></div>`;
         }
         }
         $("#chat-container").prepend(html);
@@ -319,29 +332,28 @@
         let html ="";
         for(let x=0; x<chatHistory.length;x++){
             const addClass = chatHistory[x].sender_id == sender_id ? 'current-user-chat' : 'distance-user-chat';
+            const time = chatHistory[x].createdAt.slice(chatHistory[x].createdAt.indexOf('T')+1,chatHistory[x].createdAt.indexOf('T')+6);
             if((chatHistory[x].message.split('.').pop())== 'jpg'){
                 html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >`;
+                
                     if(chatHistory[x].sender_id == sender_id)
                     html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>`;
                     
                     html+=`<img src="http://localhost:3000/images/`+chatHistory[x].message+`" alt width="300px" height="200px">
-                    
+                    <sub>${time}</sub>
                     </div>`;
                     
                        
             }
             else{
             html+= `<div class='`+addClass+`' id='`+chatHistory[x]._id+`' >
-               <h5>`;
+               <div>`;
                  if(chatHistory[x].sender_id == sender_id)
                     html+= ` <i class="fa fa-trash" aria-hidden="true" data-id='`+chatHistory[x]._id+`' data-toggle="modal" data-target="#deleteMessageModal"></i>
                     <i class="fa fa-edit" aria-hidden="true" data-id='`+chatHistory[x]._id+`'  data-msg='`+chatHistory[x].message+`'data-toggle="modal" data-target="#editMessageModal"></i>
                 `;
-                
-                
-                 
-            html+= `<span>`+chatHistory[x].message+`</span> <h5>
-            </div>`;
+ 
+            html+= `<h5><span>`+chatHistory[x].message+`</span> </h5><sub>${time}</sub></div></div>`;
         }
         }
         $("#chat-container").prepend(html);
@@ -350,6 +362,7 @@
 
     $(document).on('click', '.fa-trash', function(){
         let msg = $(this).parent().text();
+        console.log(msg);
         $('#delete-message').text(msg);
         $('#delete-message-id').val($(this).attr('data-id'));
     });
@@ -411,6 +424,6 @@
         $('#'+data.id).find('span').text(data.editedMessage);
     })
 
-
+   
 </script>
 <%- include('layouts/footer.ejs') %>
