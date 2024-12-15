@@ -1,30 +1,224 @@
-<h1>Register</h1>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Register</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background: linear-gradient(
+					to right,
+					#ff7e5f,
+					#feb47b
+				); /* Gradient background */
+				height: 100vh;
+				margin: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
 
-<form action=""  method="post"  enctype="multipart/form-data">
-	<input
-		type="text"
-		name="name"
-		placeholder="Enter your name"
-		required
-	/><br /><br />
-	<input
-		type="email"
-		name="email"
-		placeholder="Enter your email"
-		required
-	/><br /><br />
+			.register-container {
+				background: #fff;
+				padding: 30px;
+				border-radius: 10px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				width: 100%;
+				max-width: 400px;
+				box-sizing: border-box;
+				text-align: center;
+			}
 
-	<input
-		type="password"
-		name="password"
-		placeholder="Enter your password"
-		required
-	/><br /><br />
-	<input type="file" name="image" />
-	<br /><br />
-	<input type="submit" value="Register" />
-</form>
+			h1 {
+				color: #333;
+				margin-bottom: 20px;
+			}
 
-<% if(typeof message !== 'undefined'){ %>
-<p style="color: green"><%= message%></p>
-<% } %>
+			h4 {
+				color: red;
+				margin-bottom: 20px;
+			}
+
+			form {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			input[type="text"],
+			input[type="email"],
+			input[type="password"] {
+				padding: 10px;
+				margin: 10px 0;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				font-size: 16px;
+				width: 80%;
+			}
+
+			input[type="text"]:focus,
+			input[type="email"]:focus,
+			input[type="password"]:focus {
+				border-color: #feb47b; /* Soft orange border when focused */
+				outline: none;
+			}
+
+			input[type="submit"] {
+				padding: 12px;
+				background-color: #feb47b;
+				color: white;
+				font-size: 18px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				transition: background-color 0.3s ease;
+				width: 80%;
+				margin-top: 20px;
+			}
+
+			input[type="submit"]:hover {
+				background-color: #ff7e5f; /* Darker orange on hover */
+			}
+
+			input[type="submit"]:active {
+				background-color: #e36b5e; /* Even darker orange when clicked */
+			}
+
+			.success-message {
+				color: green;
+				font-size: 14px;
+				margin-top: 10px;
+			}
+
+			.error-message {
+				color: red;
+				font-size: 14px;
+				margin-top: 10px;
+			}
+
+			/* Circular Image Preview Styles */
+			.image-preview-container {
+				width: 100px;
+				height: 100px;
+				border-radius: 50%;
+				border: 3px solid #feb47b;
+				background-color: #f0f0f0;
+				margin-bottom: 20px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				cursor: pointer;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.image-preview {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+
+			.image-text {
+				display: block;
+				color: #333;
+				font-size: 14px;
+				text-align: center;
+			}
+
+			/* Register and Login buttons */
+			.login-button {
+				padding: 12px;
+				background-color: #2575fc;
+				color: white;
+				font-size: 18px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				margin-top: 20px;
+				transition: background-color 0.3s ease;
+				width: 80%;
+			}
+
+			.login-button:hover {
+				background-color: #1e62c0;
+			}
+
+			.login-button:active {
+				background-color: #1b4b9d;
+			}
+
+			/* Hidden file input */
+			#imageInput {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="register-container">
+			<h1>Register</h1>
+
+			<% if (typeof message !== 'undefined') { %>
+			<p class="success-message"><%= message %></p>
+			<% } %>
+			<form action="" method="post" enctype="multipart/form-data">
+				<!-- Image Preview Section -->
+				<label for="imageInput" class="image-preview-container">
+					<input type="file" id="imageInput" name="image" />
+					<img
+						id="imagePreview"
+						class="image-preview"
+						src=""
+						alt="Click to select image"
+					/>
+				</label>
+
+				<input
+					type="text"
+					name="name"
+					placeholder="Enter your name"
+					required
+				/><br />
+
+				<input
+					type="email"
+					name="email"
+					placeholder="Enter your email"
+					required
+				/><br />
+
+				<input
+					type="password"
+					name="password"
+					placeholder="Enter your password"
+					required
+				/><br />
+
+				<input type="submit" value="Register" />
+			</form>
+
+			<!-- Login Button -->
+			<a href="/login"><button class="login-button">Login</button></a>
+		</div>
+
+		<script>
+			// Function to show image preview
+			document
+				.getElementById("imageInput")
+				.addEventListener("change", function (event) {
+					const file = event.target.files[0];
+					if (file) {
+						const reader = new FileReader();
+						reader.onload = function (e) {
+							const imagePreview = document.getElementById("imagePreview");
+							imagePreview.style.display = "block"; // Show image preview
+							imagePreview.src = e.target.result; // Set image source
+							document.getElementById("imageText").style.display = "none"; // Hide the default text
+						};
+						reader.readAsDataURL(file);
+					}
+				});
+		</script>
+	</body>
+</html>

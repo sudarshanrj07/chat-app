@@ -1,23 +1,144 @@
-<h1>Login</h1>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Login</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background: linear-gradient(
+					to right,
+					#6a11cb,
+					#2575fc
+				); /* Gradient background */
+				height: 100vh;
+				margin: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
 
-<% if(typeof message !== 'undefined') { %>
-<h4 style="color: red"><%= message %></h4>
-<% }%>
+			.login-container {
+				background: #fff;
+				padding: 30px;
+				border-radius: 10px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				width: 100%;
+				max-width: 400px;
+				box-sizing: border-box;
+			}
 
-<form action="" method="post">
-	<input
-		type="email"
-		name="email"
-		placeholder="Enter your email"
-		required
-	/><br /><br />
+			h1 {
+				text-align: center;
+				color: #333;
+				margin-bottom: 20px;
+			}
 
-	<input
-		type="password"
-		name="password"
-		placeholder="Enter your password"
-		required
-	/><br /><br />
+			h4 {
+				color: red;
+				text-align: center;
+				margin-bottom: 20px;
+			}
 
-	<input type="submit" value="Login" />
-</form>
+			form {
+				display: flex;
+				flex-direction: column;
+			}
+
+			input[type="email"],
+			input[type="password"] {
+				padding: 10px;
+				margin: 10px 0;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				font-size: 16px;
+			}
+
+			input[type="email"]:focus,
+			input[type="password"]:focus {
+				border-color: #2575fc; /* Blue border when focused */
+				outline: none;
+			}
+
+			input[type="submit"] {
+				padding: 12px;
+				background-color: #2575fc;
+				color: white;
+				font-size: 18px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				transition: background-color 0.3s ease;
+			}
+
+			input[type="submit"]:hover {
+				background-color: #1e62c0; /* Darker blue on hover */
+			}
+
+			input[type="submit"]:active {
+				background-color: #1b4b9d; /* Even darker blue when clicked */
+			}
+
+			/* Register button */
+			.register-button {
+				padding: 12px;
+				background-color: #ff7e5f;
+				color: white;
+				font-size: 18px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				margin-top: 10px;
+				transition: background-color 0.3s ease;
+				width: 100%;
+			}
+
+			.register-button:hover {
+				background-color: #e36b5e; /* Darker orange on hover */
+			}
+
+			.register-button:active {
+				background-color: #d05b4a; /* Even darker orange when clicked */
+			}
+
+			/* Error message styling */
+			.error {
+				color: red;
+				font-size: 14px;
+				text-align: center;
+				margin-bottom: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="login-container">
+			<h1>Login</h1>
+
+			<% if (typeof message !== 'undefined') { %>
+			<h4><%= message %></h4>
+			<% } %>
+
+			<form action="" method="post">
+				<input
+					type="email"
+					name="email"
+					placeholder="Enter your email"
+					required
+				/><br />
+
+				<input
+					type="password"
+					name="password"
+					placeholder="Enter your password"
+					required
+				/><br />
+
+				<input type="submit" value="Login" />
+			</form>
+
+			<!-- Register Button -->
+			<a href="/register"><button class="register-button">Register</button></a>
+		</div>
+	</body>
+</html>

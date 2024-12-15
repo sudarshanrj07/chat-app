@@ -4,6 +4,7 @@ import { Chat } from "../models/chatModule.mjs";
 import bcrypt from "bcrypt";
 export const register = async (req, res) => {
 	try {
+		console.log("inside register");
 		const {
 			body: { name, email, password },
 			file: { filename },
