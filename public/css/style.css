@@ -10908,7 +10908,11 @@ a[data-toggle="collapse"] {
 .cursor-pointer {
 	cursor: pointer;
 }
-
+#userList {
+	max-height: 400px;
+	overflow-y: auto;
+	scroll-behavior: smooth; /* Smooth scroll */
+}
 #chat-container {
 	background-image: url("../images/light-blue-background-used-for-design-work-and-wallpaper-with-a-pattern-free-photo.jpg"); /* Path to your image */
 	background-size: cover; /* Makes the background image cover the entire div */
