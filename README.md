@@ -1,8 +1,5 @@
 # Chat App
 
-**Version**: 1.0.0  
-**License**: ISC
-
 ## Description
 
 The **Chat App** is a **real-time messaging application** built using **Node.js**, **Express.js**, and **Socket.io**. It enables users to send and receive messages instantly, providing an interactive chat experience. The app supports user authentication, file uploads, and stores chat data in **MongoDB** using **Mongoose**. Secure authentication is managed with **bcrypt** for password hashing and **express-session** for session management.
