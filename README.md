@@ -13,7 +13,7 @@ Key features include:
 - **User Authentication**: Users can securely register and log in with hashed passwords.
 - **File Uploads**: Send images and other files using **Multer** middleware.
 - **Session Management**: User sessions are maintained across requests using **express-session**.
-- **Environment Configuration**: **dotenv** is used to securely manage environment variables.
+
 
 ---
 
@@ -25,7 +25,6 @@ Key features include:
 - **Authentication**: bcrypt, express-session
 - **File Uploads**: Multer
 - **Templating**: EJS (Embedded JavaScript) for dynamic HTML rendering
-- **Environment Management**: dotenv for secure environment variables
 
 ---
 
@@ -35,7 +34,6 @@ Key features include:
 - **User Registration & Login**: Secure user authentication with password hashing and session management.
 - **File Uploads**: Users can send and receive image files or other types of files.
 - **Persistent Sessions**: Users remain logged in across multiple sessions and page refreshes.
-- **Real-time Notification**: Users get instant feedback on messages sent and received.
 
 ---
 
